@@ -1,0 +1,1 @@
+/Users/jatorre/workspace/duckdb_spatial/src/spatial/spatial_extension.hpp

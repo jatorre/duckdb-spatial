@@ -1,0 +1,280 @@
+Package: vcpkg-cmake
+Version: 2024-04-24
+Architecture: arm64-osx
+Multi-Arch: same
+Abi: 07e0de03f0483a90e4eac62a1a9dfde0ae903bc143923c6a97d9b48d98c23762
+Status: install ok installed
+
+Package: vcpkg-cmake-get-vars
+Version: 2024-09-22
+Depends: vcpkg-cmake
+Architecture: arm64-osx
+Multi-Arch: same
+Abi: 4fd1f4314f0c7111cc1cecccc50be00b8513ee985534ea8b25f933d11ac5dc28
+Status: install ok installed
+
+Package: vcpkg-cmake-config
+Version: 2024-05-23
+Architecture: arm64-osx
+Multi-Arch: same
+Abi: 98e57be2dd5fa06888657ea2cf73df712ec02146629c09b7e995f48b000e51e0
+Status: install ok installed
+
+Package: openssl
+Version: 3.5.0
+Depends: vcpkg-cmake, vcpkg-cmake-config, vcpkg-cmake-get-vars
+Architecture: arm64-osx
+Multi-Arch: same
+Abi: 68c560ed1ca04d30efdd1b91e80c77eb84fa59ce77c08ffa0b0db9e7d12d6853
+Description: OpenSSL is an open source project that provides a robust, commercial-grade, and full-featured toolkit for the Transport Layer Security (TLS) and Secure Sockets Layer (SSL) protocols. It is also a general-purpose cryptography library.
+Status: install ok installed
+
+Package: zlib
+Version: 1.3.1
+Depends: vcpkg-cmake
+Architecture: arm64-osx
+Multi-Arch: same
+Abi: b3018785e9ce4c62808f05f60ab85c562db43d7e752108e6dd5cfe14cd8021d5
+Description: A compression library
+Status: install ok installed
+
+Package: curl
+Version: 8.13.0
+Port-Version: 1
+Depends: vcpkg-cmake, vcpkg-cmake-config, zlib
+Architecture: arm64-osx
+Multi-Arch: same
+Abi: 1a0916fca1398d38f67157eae0239eebc9d4129f747ed6aebcbce0e6a2e0807d
+Description: A library for transferring data with URLs
+Default-Features: non-http, ssl
+Status: install ok installed
+
+Package: curl
+Feature: non-http
+Architecture: arm64-osx
+Multi-Arch: same
+Description: Enables protocols beyond HTTP/HTTPS/HTTP2
+Status: install ok installed
+
+Package: curl
+Feature: openssl
+Depends: openssl
+Architecture: arm64-osx
+Multi-Arch: same
+Description: SSL support (OpenSSL)
+Status: install ok installed
+
+Package: curl
+Feature: sectransp
+Architecture: arm64-osx
+Multi-Arch: same
+Description: SSL support (sectransp)
+Status: install ok installed
+
+Package: curl
+Feature: ssl
+Architecture: arm64-osx
+Multi-Arch: same
+Description: Default SSL backend
+Status: install ok installed
+
+Package: expat
+Version: 2.7.1
+Depends: vcpkg-cmake, vcpkg-cmake-config
+Architecture: arm64-osx
+Multi-Arch: same
+Abi: ce1d821bb8b625de2500054533b4f805de604afb6857489ee1ea0f413b526169
+Description: XML parser library written in C
+Status: install ok installed
+
+Package: geos
+Version: 3.13.0
+Port-Version: 1
+Depends: vcpkg-cmake, vcpkg-cmake-config
+Architecture: arm64-osx
+Multi-Arch: same
+Abi: 9ad75cfdc43016862675d53ced5fb8da9ca898770aa337f01aa503e25a98c4e4
+Description: Geometry Engine Open Source
+Status: install ok installed
+
+Package: vcpkg-tool-meson
+Version: 1.7.2
+Depends: vcpkg-cmake-get-vars
+Architecture: arm64-osx
+Multi-Arch: same
+Abi: fceb84707780c91fcd361b7738549d8763d1b8eb1d17d0d2360b4ec1b3840675
+Description: Meson build system
+Status: install ok installed
+
+Package: pkgconf
+Version: 2.4.3
+Depends: vcpkg-tool-meson
+Architecture: arm64-osx
+Multi-Arch: same
+Abi: d9fc15ad86de1980027ba936d78c09f5a7d9a66754bd4d86dc8690bc0ab3bd9e
+Description: pkgconf is a program which helps to configure compiler and linker flags for development libraries. It is similar to pkg-config from freedesktop.org.
+Status: install ok installed
+
+Package: vcpkg-pkgconfig-get-modules
+Version: 2024-04-03
+Depends: pkgconf
+Architecture: arm64-osx
+Multi-Arch: same
+Abi: be0f8850e264beefdb0548f125f198736be8a6a52b503cd1fe1d1b05d2a8d822
+Status: install ok installed
+
+Package: liblzma
+Version: 5.8.1
+Depends: vcpkg-cmake, vcpkg-cmake-config
+Architecture: arm64-osx
+Multi-Arch: same
+Abi: 4d113f8e9ee01f60f0592905d279590d2fe292a30002a5d3c22c989a92053376
+Description: Compression library with an API similar to that of zlib.
+Status: install ok installed
+
+Package: libjpeg-turbo
+Version: 3.1.0
+Port-Version: 1
+Depends: vcpkg-cmake, vcpkg-cmake-config
+Architecture: arm64-osx
+Multi-Arch: same
+Abi: b5c9317972d9c3c5823ec5e61135ce16bdf928ab74b7dd70b3b925dd57e0c5c1
+Description: libjpeg-turbo is a JPEG image codec that uses SIMD instructions (MMX, SSE2, NEON, AltiVec) to accelerate baseline JPEG compression and decompression on x86, x86-64, ARM, and PowerPC systems.
+Status: install ok installed
+
+Package: tiff
+Version: 4.7.0
+Depends: vcpkg-cmake, vcpkg-cmake-config
+Architecture: arm64-osx
+Multi-Arch: same
+Abi: c9bf5986321129346cee2d13a18a7728d88e57781f0433d708053f3f75ba2de6
+Description: A library that supports the manipulation of TIFF image files
+Default-Features: jpeg, lzma, zip
+Status: install ok installed
+
+Package: tiff
+Feature: jpeg
+Depends: libjpeg-turbo
+Architecture: arm64-osx
+Multi-Arch: same
+Description: Support JPEG compression in TIFF image files
+Status: install ok installed
+
+Package: tiff
+Feature: lzma
+Depends: liblzma
+Architecture: arm64-osx
+Multi-Arch: same
+Description: Support LZMA compression in TIFF image files
+Status: install ok installed
+
+Package: tiff
+Feature: zip
+Depends: zlib
+Architecture: arm64-osx
+Multi-Arch: same
+Description: Support ZIP/deflate compression in TIFF image files
+Status: install ok installed
+
+Package: sqlite3
+Version: 3.49.1
+Depends: vcpkg-cmake, vcpkg-cmake-config
+Architecture: arm64-osx
+Multi-Arch: same
+Abi: 9a82d8f443bd7e0430b971e2c3a1a3aae09a6cf27f7e340f5774a7b22397c608
+Description: SQLite is a software library that implements a self-contained, serverless, zero-configuration, transactional SQL database engine.
+Default-Features: json1
+Status: install ok installed
+
+Package: sqlite3
+Feature: json1
+Architecture: arm64-osx
+Multi-Arch: same
+Description: Enable JSON functionality for sqlite3
+Status: install ok installed
+
+Package: sqlite3
+Feature: rtree
+Architecture: arm64-osx
+Multi-Arch: same
+Description: Enable the RTREE extension
+Status: install ok installed
+
+Package: sqlite3
+Feature: tool
+Architecture: arm64-osx
+Multi-Arch: same
+Description: Build sqlite3 executable
+Status: install ok installed
+
+Package: nlohmann-json
+Version: 3.11.3
+Port-Version: 1
+Depends: vcpkg-cmake, vcpkg-cmake-config
+Architecture: arm64-osx
+Multi-Arch: same
+Abi: 28c7bdbb00361282b76724d107dcaf8194a64a71a35a40262f92a1c55a265c4d
+Description: JSON for Modern C++
+Status: install ok installed
+
+Package: proj
+Version: 9.1.1
+Depends: nlohmann-json, sqlite3, vcpkg-cmake, vcpkg-cmake-config
+Architecture: arm64-osx
+Multi-Arch: same
+Abi: 8402430a7a26c78f043e949aa2bdb9d165a61dbdb15622a7d04c23dbad96c6f7
+Description: PROJ library for cartographic projections
+Default-Features: net, tiff
+Status: install ok installed
+
+Package: proj
+Feature: tiff
+Depends: tiff
+Architecture: arm64-osx
+Multi-Arch: same
+Description: Enable TIFF support to read some grids
+Status: install ok installed
+
+Package: libgeotiff
+Version: 1.7.4
+Depends: proj, tiff, vcpkg-cmake, vcpkg-cmake-config
+Architecture: arm64-osx
+Multi-Arch: same
+Abi: d64131707eb93037308861a4d027c9621eaabaf7c5978e851801cd37a3b99f6c
+Description: Libgeotiff is an open source library on top of libtiff for reading and writing GeoTIFF information tags.
+Status: install ok installed
+
+Package: json-c
+Version: 0.18-20240915
+Depends: vcpkg-cmake, vcpkg-cmake-config
+Architecture: arm64-osx
+Multi-Arch: same
+Abi: aec06db223a0f422f6739ac9efaa1a4d0aefbffd77fc3b7be6dfc2ea7964be31
+Description: A JSON implementation in C
+Status: install ok installed
+
+Package: gdal
+Version: 3.8.5
+Depends: json-c, libgeotiff, pkgconf, proj, tiff, vcpkg-cmake, vcpkg-cmake-config, vcpkg-pkgconfig-get-modules, zlib
+Architecture: arm64-osx
+Multi-Arch: same
+Abi: a86fd2b77e6c6196228833fa2010df9a31e7b9a93090fd81c49f885a3f2c475b
+Description: The Geographic Data Abstraction Library for reading and writing geospatial raster and vector data
+Status: install ok installed
+
+Package: gdal
+Feature: geos
+Depends: geos
+Architecture: arm64-osx
+Multi-Arch: same
+Description: Enable GEOS support
+Status: install ok installed
+
+Package: gdal
+Feature: network
+Depends: curl
+Architecture: arm64-osx
+Multi-Arch: same
+Description: Enable network support
+Status: install ok installed
+

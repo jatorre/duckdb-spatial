@@ -1,0 +1,12 @@
+prefix=${pcfiledir}/../..
+exec_prefix=${prefix}
+includedir=${prefix}/../include
+libdir=${exec_prefix}/lib
+
+Name: GEOS
+Description: Geometry Engine, Open Source - C API
+Version: 3.13.0
+
+Libs: "-L${libdir}" -lgeos_c -lgeos -lc++ -lm
+Requires: 
+Cflags: "-I${includedir}"

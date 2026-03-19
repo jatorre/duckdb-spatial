@@ -1774,6 +1774,14 @@ auto Bind(ClientContext &context, TableFunctionBindInput &input, vector<LogicalT
 	types.push_back(LogicalType::VARCHAR);
 	types.push_back(LogicalType::LIST(GetLayerType()));
 
+	// PR #775: bypass MultiFileReader for /vsi* paths (GDAL virtual filesystem)
+	const auto file_name = input.inputs[0].GetValue<string>();
+	if (StringUtil::StartsWith(file_name, "/vsi")) {
+		auto result = make_uniq<BindData>();
+		result->files.emplace_back(file_name);
+		return std::move(result);
+	}
+
 	const auto mf_reader = MultiFileReader::Create(input.table_function);
 	const auto mf_inputs = mf_reader->CreateFileList(context, input.inputs[0], FileGlobOptions::ALLOW_EMPTY);
 
