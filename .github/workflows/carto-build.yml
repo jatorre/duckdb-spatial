@@ -7,73 +7,14 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
-    name: Build ${{ matrix.os }} (${{ matrix.arch }})
-    runs-on: ${{ matrix.runner }}
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - os: macos
-            arch: arm64
-            runner: macos-14
-          - os: linux
-            arch: amd64
-            runner: ubuntu-22.04
-
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          submodules: recursive
-
-      - name: Install build tools
-        run: |
-          if [ "${{ matrix.os }}" = "macos" ]; then
-            brew install ninja
-          else
-            sudo apt-get update && sudo apt-get install -y ninja-build
-          fi
-
-      - name: Setup vcpkg and install deps
-        run: |
-          git clone https://github.com/microsoft/vcpkg.git vcpkg_repo
-          cd vcpkg_repo && git checkout ce613c41372b23b1f51333815feb3edd87ef8a8b
-          ./bootstrap-vcpkg.sh
-          cd ..
-          # Install deps from our vcpkg.json manifest
-          ./vcpkg_repo/vcpkg install --x-manifest-root=. --triplet=${{ matrix.os == 'macos' && 'arm64-osx' || 'x64-linux' }}
-        env:
-          VCPKG_ROOT: ${{ github.workspace }}/vcpkg_repo
-
-      - name: Configure
-        run: |
-          cmake -G Ninja \
-            -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/vcpkg_repo/scripts/buildsystems/vcpkg.cmake \
-            -DCMAKE_PREFIX_PATH=${{ github.workspace }}/vcpkg_installed/${{ matrix.os == 'macos' && 'arm64-osx' || 'x64-linux' }} \
-            -DCMAKE_BUILD_TYPE=Release \
-            -DEXTENSION_STATIC_BUILD=1 \
-            -DDUCKDB_EXTENSION_NAMES="spatial" \
-            -DDUCKDB_EXTENSION_SPATIAL_PATH=${{ github.workspace }} \
-            -DDUCKDB_EXTENSION_SPATIAL_SHOULD_LINK=1 \
-            -S duckdb -B build/release
-
-      - name: Build
-        run: |
-          # Copy spatial_extension.hpp to codegen include path if needed
-          mkdir -p build/release/codegen/include
-          cp src/spatial/spatial_extension.hpp build/release/codegen/include/ 2>/dev/null || true
-          ninja -C build/release -j$(nproc 2>/dev/null || sysctl -n hw.ncpu)
-
-      - name: Package
-        run: |
-          mkdir -p dist
-          find build/release -name "*.duckdb_extension" -exec cp {} dist/ \;
-          cp build/release/duckdb dist/ 2>/dev/null || true
-          ls -lh dist/
-
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: spatial-${{ matrix.os }}-${{ matrix.arch }}
-          path: dist/
-          retention-days: 90
+  # Use the official DuckDB extension CI tools — same as upstream
+  duckdb-build:
+    name: Build extension binaries
+    uses: duckdb/extension-ci-tools/.github/workflows/_extension_distribution.yml@main
+    with:
+      duckdb_version: main
+      extension_name: spatial
+      ci_tools_version: main
+      vcpkg_commit: ce613c41372b23b1f51333815feb3edd87ef8a8b
+      # Only build the platforms we need
+      exclude_archs: 'windows_amd64;windows_amd64_mingw;wasm_mvp;wasm_eh;wasm_threads'
