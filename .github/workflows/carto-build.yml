@@ -11,6 +11,7 @@ jobs:
     name: Build ${{ matrix.os }} (${{ matrix.arch }})
     runs-on: ${{ matrix.runner }}
     strategy:
+      fail-fast: false
       matrix:
         include:
           - os: macos
@@ -25,12 +26,7 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Setup vcpkg
-        uses: lukka/run-vcpkg@v11
-        with:
-          vcpkgGitCommitId: ce613c41372b23b1f51333815feb3edd87ef8a8b
-
-      - name: Install Ninja
+      - name: Install build tools
         run: |
           if [ "${{ matrix.os }}" = "macos" ]; then
             brew install ninja
@@ -38,10 +34,22 @@ jobs:
             sudo apt-get update && sudo apt-get install -y ninja-build
           fi
 
+      - name: Setup vcpkg and install deps
+        run: |
+          git clone https://github.com/microsoft/vcpkg.git vcpkg_repo
+          cd vcpkg_repo && git checkout ce613c41372b23b1f51333815feb3edd87ef8a8b
+          ./bootstrap-vcpkg.sh
+          cd ..
+          # Install deps from our vcpkg.json manifest
+          ./vcpkg_repo/vcpkg install --x-manifest-root=. --triplet=${{ matrix.os == 'macos' && 'arm64-osx' || 'x64-linux' }}
+        env:
+          VCPKG_ROOT: ${{ github.workspace }}/vcpkg_repo
+
       - name: Configure
         run: |
           cmake -G Ninja \
-            -DCMAKE_TOOLCHAIN_FILE=$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake \
+            -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/vcpkg_repo/scripts/buildsystems/vcpkg.cmake \
+            -DCMAKE_PREFIX_PATH=${{ github.workspace }}/vcpkg_installed/${{ matrix.os == 'macos' && 'arm64-osx' || 'x64-linux' }} \
             -DCMAKE_BUILD_TYPE=Release \
             -DEXTENSION_STATIC_BUILD=1 \
             -DDUCKDB_EXTENSION_NAMES="spatial" \
@@ -50,14 +58,16 @@ jobs:
             -S duckdb -B build/release
 
       - name: Build
-        run: ninja -C build/release -j$(nproc 2>/dev/null || sysctl -n hw.ncpu)
+        run: |
+          # Copy spatial_extension.hpp to codegen include path if needed
+          mkdir -p build/release/codegen/include
+          cp src/spatial/spatial_extension.hpp build/release/codegen/include/ 2>/dev/null || true
+          ninja -C build/release -j$(nproc 2>/dev/null || sysctl -n hw.ncpu)
 
-      - name: Package extension
+      - name: Package
         run: |
           mkdir -p dist
-          # Find the loadable extension
           find build/release -name "*.duckdb_extension" -exec cp {} dist/ \;
-          # Also copy the DuckDB CLI binary
           cp build/release/duckdb dist/ 2>/dev/null || true
           ls -lh dist/
 
