@@ -1284,6 +1284,11 @@ auto InitGlobal(ClientContext &context, FunctionData &bdata_p, const string &rea
 		// Make a new spatial reference object, and set it from the user input
 		result->srs = OSRNewSpatialReference(nullptr);
 		OSRSetFromUserInput(result->srs, bdata.target_srs.c_str());
+		// DuckDB GEOMETRY always uses traditional GIS axis order (lon, lat).
+		// Without this, GDAL 3.x defaults to authority-compliant order for
+		// EPSG:4326 (lat, lon), causing KML and other drivers to reject valid
+		// longitudes > 90 as out-of-range latitudes. (PR #776)
+		OSRSetAxisMappingStrategy(result->srs, OAMS_TRADITIONAL_GIS_ORDER);
 	}
 
 	// Create Layer
@@ -1606,6 +1611,16 @@ auto Bind(ClientContext &context, TableFunctionBindInput &input, vector<LogicalT
 	types.push_back(LogicalType::VARCHAR);
 	types.push_back(LogicalType::VARCHAR);
 	types.push_back(LogicalType::LIST(GetLayerType()));
+
+	// If the path starts with /vsi (GDAL virtual filesystem), pass it directly to GDAL.
+	// MultiFileReader doesn't understand /vsizip/, /vsicurl/, etc. and silently returns
+	// an empty file list, causing st_read_meta to return 0 rows. (PR #775)
+	const auto file_name = input.inputs[0].GetValue<string>();
+	if (StringUtil::StartsWith(file_name, "/vsi")) {
+		auto result = make_uniq<BindData>();
+		result->files.emplace_back(file_name);
+		return std::move(result);
+	}
 
 	const auto mf_reader = MultiFileReader::Create(input.table_function);
 	const auto mf_inputs = mf_reader->CreateFileList(context, input.inputs[0], FileGlobOptions::ALLOW_EMPTY);
